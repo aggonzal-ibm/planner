@@ -1,81 +1,80 @@
-(define (domain ambulance)
-  (:requirements :strips :equality :typing :conditional-effects)
+(define (domain ambulancia)
+     (:requirements :strips :equality :typing :conditional-effects)
 
-  (:types  ambulance location pacient )
+     (:types
+          ambulancia locacion paciente
+     )
 
+     (:predicates
+          (ambulancia ?a - ambulancia)
+          (ambulancia_locacion ?a - ambulancia ?locacion - locacion)
+          (dentro_ambulancia ?p - paciente ?a - ambulancia)
+          (paciente_locacion ?p - paciente ?locacion1 - locacion)
+          (fuera_ambulancia ?p - paciente)
+          (camino ?locacion - locacion ?locacion2 - locacion)
 
-  (:predicates
-    (ambstate ?a - ambulance)
-    (amblocation ?a - ambulance ?location - location)
-    (inAmb     ?p - pacient ?a - ambulance)
-    (plocation ?p - pacient ?location1 - location)
-    (outAmb    ?p - pacient)
-    (road ?location1 - location ?location2 - location)
- 
-  )
-  (:action PacientOut
-       :parameters ( ?a - ambulance  ?location - location ?p - pacient)
-       :precondition (and 
-            (ambstate ?a)
-            (amblocation ?a ?location)
-            (inAmb ?p ?a)
-            (plocation ?p ?location)
-       )
-       :effect (and 
-            (not (inAmb ?p ?a))
-            (outAmb ?p)
-        )
-    )
-  (:action PacientIn
-       :parameters ( ?a - ambulance ?location - location ?p - pacient)
-       :precondition (and 
-            (ambstate ?a)
-            (amblocation ?a ?location)
-            (outAmb ?p)
-            (plocation ?p ?location)
-            
-       )
-       :effect (and 
-            (not (outAmb ?p))
-            (inAmb ?p ?a)
-        )
-    )
-  (:action moveAmbulanceEmpty
-       :parameters ( ?a - ambulance ?locationa - location  ?locationb - location )
-       :precondition (and 
-            (ambstate ?a)
-            (amblocation ?a ?locationa)
-            (road ?locationa ?locationb)
-            
-           
-       )
-       :effect (and 
-            (not (amblocation ?a ?locationa))
-            (amblocation ?a ?locationb)
-            (road ?locationa ?locationb)
-        
-        )
-    )
+     )
+     (:action EntregarPaciente
+          :parameters ( ?a - ambulancia ?locacion - locacion ?p - paciente)
+          :precondition (and
+               (ambulancia ?a)
+               (ambulancia_locacion ?a ?locacion)
+               (dentro_ambulancia ?p ?a)
+               (paciente_locacion ?p ?locacion)
+          )
+          :effect (and
+               (not (dentro_ambulancia ?p ?a))
+               (fuera_ambulancia ?p)
+          )
+     )
+     (:action TreparPaciente
+          :parameters ( ?a - ambulancia ?locacion - locacion ?p - paciente)
+          :precondition (and
+               (ambulancia ?a)
+               (ambulancia_locacion ?a ?locacion)
+               (fuera_ambulancia ?p)
+               (paciente_locacion ?p ?locacion)
 
+          )
+          :effect (and
+               (not (fuera_ambulancia ?p))
+               (dentro_ambulancia ?p ?a)
+          )
+     )
 
-      (:action moveAmbulanceWithPacient
-       :parameters ( ?a - ambulance ?locationa - location  ?locationb - location ?p - pacient)
-       :precondition (and 
-            (ambstate ?a)
-            (amblocation ?a ?locationa)
-            (inAmb ?p ?a)
-            (plocation ?p ?locationa)
-            (road ?locationa ?locationb)
+     (:action MoverAmbulanciaVacia
+          :parameters ( ?a - ambulancia ?locaciona - locacion ?locacionb - locacion)
+          :precondition (and
+               (ambulancia ?a)
+               (ambulancia_locacion ?a ?locaciona)
+               (camino ?locaciona ?locacionb)
 
-           
-       )
-       :effect (and 
-            (not (amblocation ?a ?locationa))
-            (not (plocation ?p ?locationa))
-            (amblocation ?a ?locationb)
-            (road ?locationa ?locationb)
-            (plocation ?p ?locationb)
-        )
-    )
+          )
+          :effect (and
+               (not (ambulancia_locacion ?a ?locaciona))
+               (ambulancia_locacion ?a ?locacionb)
+               (camino ?locaciona ?locacionb)
 
-  )
+          )
+     )
+
+     (:action MoverAmbulanciaConPaciente
+          :parameters ( ?a - ambulancia ?locaciona - locacion ?locacionb - locacion ?p - paciente)
+          :precondition (and
+               (ambulancia ?a)
+               (ambulancia_locacion ?a ?locaciona)
+               (dentro_ambulancia ?p ?a)
+               (paciente_locacion ?p ?locaciona)
+               (camino ?locaciona ?locacionb)
+
+          )
+          :effect (and
+               (not (ambulancia_locacion ?a ?locaciona))
+               (not (paciente_locacion ?p ?locaciona))
+               (ambulancia_locacion ?a ?locacionb)
+               (camino ?locaciona ?locacionb)
+               (paciente_locacion ?p ?locacionb)
+          )
+     )
+
+)
