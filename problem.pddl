@@ -1,4 +1,4 @@
-define (problem Recoger_Pacientes)
+(define (problem Recoger_Pacientes)
    (:domain ambulancia)
    (:objects
          ambulancia  - ambulancia
